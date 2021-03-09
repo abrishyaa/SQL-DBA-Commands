@@ -1,0 +1,96 @@
+SQL Server : Important Commands for SQL Server DBA
+
+--To check for Blocked Processes:
+Sp_who2   
+--To find all the log files and the percentage space used of those log files in an instance:
+dbcc sqlperf (logspace)  
+--To list all the files and their details in a particular database:
+exec sp_helpfile
+--To list all the databases and their details in a instance:
+exec sp_helpdb
+--To shrink a database file without specifying target size(preferred for log files):
+dbcc shrinkfile(fileid)
+--To shrink a database file with specifying target size(preferred for datafiles):
+dbcc shrinkfile(fileid,target_size)
+--To find the details about locks currently held by the processes:
+exec sp_lock
+--To find all the drive spaces through MS SQL:
+EXEC master..xp_fixeddrives
+--To put the database in single user mode at command prompt:
+sqlservr.exe –m
+--To put the database in Minimal mode at command prompt:
+sqlservr.exe –f         -->  -c  for console applications
+--To find out the Database ID?
+ Select db_id ('db_name')
+--To find out logins:
+select * from sys.syslogins
+--To find out current user:
+Select current_user
+--Short cut for MS SQL Server Management studio:
+sqlwb.exe
+--To check the service pack at product level:
+select serverproperty ('machinename')
+SELECT  SERVERPROPERTY('productversion'), SERVERPROPERTY ('productlevel'),SERVERPROPERTY ('edition')
+--To check the open transactions :
+dbcc opentran('dbname')
+--To find MS SQL Server product level details:
+exec master..xp_msver
+--To find the details of current processes running like percent completed:
+select * from sys.dm_exec_requests
+--To find the longest running queries
+select * from sys.dm_exec_query_stats
+--Command to find the free space and used space :
+select * from dbo.sysfiles
+--To check load in server and database and files:
+select * from sys.dm_io_virtual_file_stats(database id,file id)
+--To find the longest running queries
+select * from sys.dm_exec_sql_text
+--To find Orphan login:
+sp_validatelogins
+--To find orphaned users
+EXEC sp_change_users_login 'Report'
+--To map users to logins
+exec sp_change_users_login @Action='update_one', @UserNamePattern='<database_user>',@LoginName='<login_name>'
+--If you already have a login id and password for this user, fix it by doing:
+exec sp_change_users_login 'Auto_Fix', 'user'
+--To delete login:
+exec sp_revokelogin 'USERX'
+--To list all the objects owned by user id:
+Select name from sysobjects where uid=user_id('user')
+--To enable ‘show advanced options’ for server configuration options:
+exec sp_configure 'show advanced options', 1
+--To enable particlar server configuration option:
+exec sp_configure 'option name', 1
+--To find performnce related stastictics:
+select * from sys.dm_os_performance_counters
+--To find the information about indexes on tables and views.
+select * from sys.dm_db_index_usage_stats
+--To find out all of the users who are connected to the database server:
+select * from sys.dm_exec_sessions
+--To display the error log using the query:
+xp_readerrorlog
+--To display error log archive numbers and their dates:
+exec sp_enumerrorlogs
+--To view no. of traces running.
+SELECT count(*) FROM :: fn_trace_getinfo(default) WHERE property = 5 and value = 1
+--To find details about the traces which are running.
+SELECT * FROM :: fn_trace_getinfo(default)
+--To terminate a trace
+EXEC sp_trace_setstatus 1, @status = 0 / @status=2
+--To know the Space used bye Data,index in particular Database:
+Sp_spaceused
+--To know  the DB status of particular Database:
+SELECT DATABASEPROPERTYEX('AdventureWorks', 'Status')
+--To view jobs which failed at last run:
+ sysjobactivity, sysjobschedules, msdb.dbo.sysjobservers, msdb.dbo.sysjobs
+--To check pages of table :
+Dbcc ind('dbname','tablename',-1)
+--To check pages contents
+dbcc trace on(3604)  dbcc page('dbname',fid,pid,1)              -- F:File  P:page
+--To set maximum connections.
+exec SP_Configure
+--To find no.of connections.
+SELECT COUNT(dbid) as TotalConnections FROM sys.sysprocesses WHERE dbid > 0
+--If log file is full,To find out reason.
+Select name,log_reuse_wait_desc  from sys.databases
+
